@@ -1,0 +1,21 @@
+jlmdtm = textmatrix("~/Dropbox/Dissertation/DataParsed/files",stopwords="stopwords_en")
+space500 = lsa(jlmdtm)
+neighbors (testword, 10, tvectors= space500[[1]]) # BAM! or...
+neighbors ("term", 20, tvectors=space500[[1]])
+# the semantic space has 3 matrices in it: tk (term-dimension matrix), dk (document-dimension matrix), and sk (singular values)
+# sk seems to be in descending order... I'm not sure what the implications of this are. But this is probably what helps in identifying the optimal number of dimensions...
+# Oh look, I can retrieve the vector based on the row number:
+space500[[1]][1000,1-500]
+# Or the value...
+space500[[1]]["jobs",1-500]
+# This lets me do tf*idf weighting on the matrix... this should be done before we create the semantic space. See weighing man page.
+tm_tfidf = lw_tf(jlmdtm) * gw_idf(jlmdtm)
+#
+# Exploring a single dimension...
+#
+# What is this row's strongest dimension?
+max(space500[[1]]["jobs",1-500])
+# I noticed that "jobs" was high on col 269.
+# It was actually the max value for 269 across the matrix. 
+plaintf = space500[[1]]
+highJobs=(plaintf[plaintf[,269]>.08],,drop=FALSE)
